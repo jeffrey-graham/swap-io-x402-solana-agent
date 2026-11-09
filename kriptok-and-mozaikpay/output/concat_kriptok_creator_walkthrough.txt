@@ -1,0 +1,9 @@
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/kriptok-and-mozaikpay/output/kriptok_slide_1.png'
+duration 15
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/kriptok-and-mozaikpay/output/kriptok_slide_2.png'
+duration 15
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/kriptok-and-mozaikpay/output/kriptok_slide_3.png'
+duration 15
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/kriptok-and-mozaikpay/output/kriptok_slide_4.png'
+duration 15
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/kriptok-and-mozaikpay/output/kriptok_slide_4.png'

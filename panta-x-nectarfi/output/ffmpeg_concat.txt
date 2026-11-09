@@ -1,0 +1,9 @@
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/panta-x-nectarfi/output/card_1_overview.png'
+duration 11
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/panta-x-nectarfi/output/card_2_ev_math.png'
+duration 12
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/panta-x-nectarfi/output/card_3_zero_loss_loop.png'
+duration 11
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/panta-x-nectarfi/output/card_4_strategy.png'
+duration 11
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/panta-x-nectarfi/output/card_4_strategy.png'

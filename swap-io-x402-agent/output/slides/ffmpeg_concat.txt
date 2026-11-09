@@ -1,0 +1,11 @@
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/swap-io-x402-agent/output/slides/slide_01_problem_and_hook.png'
+duration 12
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/swap-io-x402-agent/output/slides/slide_02_agent_scenario.png'
+duration 13
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/swap-io-x402-agent/output/slides/slide_03_x402_protocol_flow.png'
+duration 15
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/swap-io-x402-agent/output/slides/slide_04_live_terminal_and_solscan.png'
+duration 20
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/swap-io-x402-agent/output/slides/slide_05_unit_economics_and_cta.png'
+duration 15
+file '/home/jeff/.gemini/antigravity/scratch/freelancework/pool-contests/superteam-multi-winner/swap-io-x402-agent/output/slides/slide_05_unit_economics_and_cta.png'

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panta x NectarFi — Prediction Market EV & USDG Yield Strategy Calculator</title>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: #111827;
+      --bg-panel: #1a2438;
+      --accent-teal: #14f195;
+      --accent-gold: #f59e0b;
+      --accent-cyan: #00c2ff;
+      --accent-purple: #9945ff;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #263554;
+      --danger: #ef4444;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background: radial-gradient(circle at top right, #162238 0%, var(--bg-dark) 65%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 28px 20px 60px;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 22px 28px;
+      background: linear-gradient(135deg, rgba(20,241,149,0.1) 0%, rgba(245,158,11,0.1) 50%, rgba(153,69,255,0.12) 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      margin-bottom: 24px;
+    }
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(20, 241, 149, 0.14);
+      color: var(--accent-teal);
+      border: 1px solid rgba(20, 241, 149, 0.4);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .subhead {
+      color: var(--text-muted);
+      font-size: 0.96rem;
+      margin-top: 4px;
+    }
+    .preset-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .preset-btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .preset-btn:hover, .preset-btn.active {
+      border-color: var(--accent-teal);
+      background: rgba(20, 241, 149, 0.12);
+      color: var(--accent-teal);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 24px;
+    }
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+    }
+    .control-group {
+      margin-bottom: 18px;
+    }
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .control-val {
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-teal);
+      cursor: pointer;
+      height: 6px;
+      background: var(--bg-panel);
+      border-radius: 6px;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .kpi-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .kpi-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .kpi-value {
+      font-size: 1.55rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .kpi-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .positive { color: var(--accent-teal); }
+    .warning { color: var(--accent-gold); }
+    .negative { color: var(--danger); }
+    .cyan { color: var(--accent-cyan); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      color: var(--accent-cyan);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .chart-box {
+      background: #0c1220;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 18px;
+    }
+    .tweet-box {
+      margin-top: 18px;
+      background: rgba(153, 69, 255, 0.1);
+      border: 1px solid rgba(153, 69, 255, 0.4);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .tweet-text {
+      font-family: monospace;
+      font-size: 0.86rem;
+      color: #e2e8f0;
+      line-height: 1.45;
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+    }
+    .copy-btn {
+      background: var(--accent-teal);
+      color: #06121e;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="brand-badge">Panta x NectarFi Trading Competition • 500 USDG Prize Pool</div>
+        <h1>Panta Prediction Market EV &amp; NectarFi USDG Yield Simulator</h1>
+        <p class="subhead">Combine productive USDG stablecoin yield on <strong>@Nectar_finance</strong> with high-conviction event contracts on <strong>@PantaHQ</strong> (`#PantaMarkets`).</p>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 0.82rem; color: var(--text-muted);">COMPETITION STRUCTURE</div>
+        <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent-gold);">5 Winners × 100 USDG</div>
+        <div style="font-size: 0.82rem; color: var(--accent-teal);">Powered by @SuperteamNG</div>
+      </div>
+    </header>
+
+    <div class="preset-bar">
+      <button class="preset-btn active" onclick="applyPreset(2500, 75, 15.0, 30, 0.42, 60, this)">
+        Balanced Yield + Alpha (75% NectarFi / 25% Panta)
+      </button>
+      <button class="preset-btn" onclick="applyPreset(5000, 94, 16.5, 45, 0.35, 55, this)">
+        Zero-Loss Principal Guard (Yield Finances Prediction Bet)
+      </button>
+      <button class="preset-btn" onclick="applyPreset(1500, 50, 14.0, 21, 0.28, 48, this)">
+        Competition Leaderboard Sprint (50/50 High EV)
+      </button>
+      <button class="preset-btn" onclick="applyPreset(10000, 85, 15.5, 60, 0.62, 76, this)">
+        Institutional Macro Hedge (SOL &gt; $220 Consensus)
+      </button>
+    </div>
+
+    <div class="grid">
+      <!-- Left Column: Strategy Controls -->
+      <div class="card">
+        <div class="card-title">
+          <span>1. Capital &amp; Market Parameters</span>
+          <span style="font-size: 0.8rem; color: var(--accent-teal);">Live Calculator</span>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Total USDG Capital Pool</span>
+            <span class="control-val" id="lbl-capital">$2,500 USDG</span>
+          </div>
+          <input type="range" id="inp-capital" min="250" max="25000" step="250" value="2500" oninput="recalc()" />
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>NectarFi USDG Yield Vault Allocation (%)</span>
+            <span class="control-val" id="lbl-nectar-pct">75% NectarFi / 25% Panta</span>
+          </div>
+          <input type="range" id="inp-nectar-pct" min="10" max="98" step="1" value="75" oninput="recalc()" />
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>NectarFi USDG Vault APY (%)</span>
+            <span class="control-val" id="lbl-apy">15.0% APY</span>
+          </div>
+          <input type="range" id="inp-apy" min="5" max="30" step="0.5" value="15.0" oninput="recalc()" />
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Competition / Vault Duration (Days)</span>
+            <span class="control-val" id="lbl-days">30 Days</span>
+          </div>
+          <input type="range" id="inp-days" min="7" max="90" step="1" value="30" oninput="recalc()" />
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Panta Market Implied Price (`YES` Share Price)</span>
+            <span class="control-val" id="lbl-price">$0.42 (42% Implied)</span>
+          </div>
+          <input type="range" id="inp-price" min="0.08" max="0.92" step="0.01" value="0.42" oninput="recalc()" />
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <span>Your Estimated True Event Probability (`p`)</span>
+            <span class="control-val" id="lbl-prob">60% True Prob (+18% Edge)</span>
+          </div>
+          <input type="range" id="inp-prob" min="5" max="95" step="1" value="60" oninput="recalc()" />
+        </div>
+
+        <div class="tweet-box">
+          <div style="font-size: 0.78rem; font-weight: 700; color: #d8b4fe; margin-bottom: 6px;">
+            READY-TO-POST #PANTAMARKETS STRATEGY SNAPSHOT
+          </div>
+          <div class="tweet-text" id="tweet-preview"></div>
+          <button class="copy-btn" onclick="copyTweet()">Copy Strategy Post for X</button>
+        </div>
+      </div>
+
+      <!-- Right Column: Expected Value & Scenario Output -->
+      <div class="card">
+        <div class="card-title">
+          <span>2. Expected Value (EV) &amp; Downside Protection Matrix</span>
+          <span style="font-size: 0.8rem; color: var(--accent-gold);">USDG Settlement</span>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-box">
+            <div class="kpi-label">Combined Portfolio Expected Value</div>
+            <div class="kpi-value positive" id="kpi-ev">+$291.19</div>
+            <div class="kpi-sub" id="kpi-ev-roi">+11.65% Expected Return</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">NectarFi USDG Yield Cushion</div>
+            <div class="kpi-value cyan" id="kpi-yield">+$23.12 USDG</div>
+            <div class="kpi-sub" id="kpi-yield-sub">Guaranteed base yield over 30d</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">If Panta Market Resolves YES ($1.00)</div>
+            <div class="kpi-value positive" id="kpi-win">+$886.21</div>
+            <div class="kpi-sub" id="kpi-shares">1,488.10 YES shares @ $0.42</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">Kelly Criterion Optimal Panta Stake</div>
+            <div class="kpi-value warning" id="kpi-kelly">31.0%</div>
+            <div class="kpi-sub" id="kpi-kelly-sub">Half-Kelly Recommended: 15.5%</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Scenario Outcome</th>
+              <th>NectarFi Vault Value</th>
+              <th>Panta Position Value</th>
+              <th>Total Portfolio (USDG)</th>
+              <th>Net PnL (%)</th>
+            </tr>
+          </thead>
+          <tbody id="scenario-tbody"></tbody>
+        </table>
+
+        <div class="chart-box">
+          <div style="display:flex; justify-content:space-between; font-size:0.84rem; color:var(--text-muted); margin-bottom:10px;">
+            <span><strong>Expected Value Curve Across True Event Probability (5% to 95%)</strong></span>
+            <span>Green Zone = +EV Edge vs Market Price</span>
+          </div>
+          <svg id="ev-svg" viewBox="0 0 700 210" width="100%" height="210"></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function applyPreset(cap, nectarPct, apy, days, price, prob, btn) {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      document.getElementById('inp-capital').value = cap;
+      document.getElementById('inp-nectar-pct').value = nectarPct;
+      document.getElementById('inp-apy').value = apy;
+      document.getElementById('inp-days').value = days;
+      document.getElementById('inp-price').value = price;
+      document.getElementById('inp-prob').value = prob;
+      recalc();
+    }
+
+    function recalc() {
+      const capital = parseFloat(document.getElementById('inp-capital').value);
+      const nectarPct = parseFloat(document.getElementById('inp-nectar-pct').value);
+      const pantaPct = 100 - nectarPct;
+      const apy = parseFloat(document.getElementById('inp-apy').value);
+      const days = parseInt(document.getElementById('inp-days').value, 10);
+      const price = parseFloat(document.getElementById('inp-price').value);
+      const prob = parseFloat(document.getElementById('inp-prob').value) / 100.0;
+
+      const nectarPrincipal = capital * (nectarPct / 100.0);
+      const pantaStake = capital * (pantaPct / 100.0);
+      const nectarYield = nectarPrincipal * (apy / 100.0) * (days / 365.0);
+      const nectarEnd = nectarPrincipal + nectarYield;
+
+      const shares = pantaStake / price;
+      const pantaWinPayout = shares * 1.0;
+      const pantaWinProfit = pantaWinPayout - pantaStake;
+      const pantaLossProfit = -pantaStake;
+
+      const pantaEV = prob * pantaWinProfit + (1 - prob) * pantaLossProfit;
+      const totalEV = nectarYield + pantaEV;
+      const totalEvPct = (totalEV / capital) * 100.0;
+
+      const totalIfYes = nectarEnd + pantaWinPayout;
+      const netIfYes = totalIfYes - capital;
+      const totalIfNo = nectarEnd;
+      const netIfNo = totalIfNo - capital;
+
+      // Kelly fraction for binary contract at price c with true prob p: f* = (p - c) / (1 - c)
+      const rawKelly = Math.max(0, (prob - price) / (1 - price)) * 100.0;
+
+      document.getElementById('lbl-capital').textContent = `$${capital.toLocaleString()} USDG`;
+      document.getElementById('lbl-nectar-pct').textContent = `${nectarPct}% NectarFi / ${pantaPct}% Panta`;
+      document.getElementById('lbl-apy').textContent = `${apy.toFixed(1)}% APY`;
+      document.getElementById('lbl-days').textContent = `${days} Days`;
+      document.getElementById('lbl-price').textContent = `$${price.toFixed(2)} (${Math.round(price * 100)}% Implied)`;
+      const edgePts = Math.round((prob - price) * 100);
+      const edgeSign = edgePts >= 0 ? `+${edgePts}%` : `${edgePts}%`;
+      document.getElementById('lbl-prob').textContent = `${Math.round(prob * 100)}% True Prob (${edgeSign} Edge)`;
+
+      const evEl = document.getElementById('kpi-ev');
+      evEl.textContent = `${totalEV >= 0 ? '+' : ''}$${totalEV.toFixed(2)}`;
+      evEl.className = 'kpi-value ' + (totalEV >= 0 ? 'positive' : 'negative');
+      document.getElementById('kpi-ev-roi').textContent = `${totalEvPct >= 0 ? '+' : ''}${totalEvPct.toFixed(2)}% Expected Return over ${days}d`;
+
+      document.getElementById('kpi-yield').textContent = `+$${nectarYield.toFixed(2)} USDG`;
+      document.getElementById('kpi-yield-sub').textContent = `Offsets ${Math.min(100, (nectarYield / Math.max(1, pantaStake)) * 100).toFixed(1)}% of Panta stake risk`;
+
+      document.getElementById('kpi-win').textContent = `+$${netIfYes.toFixed(2)}`;
+      document.getElementById('kpi-shares').textContent = `${shares.toFixed(1)} YES shares @ $${price.toFixed(2)}`;
+
+      document.getElementById('kpi-kelly').textContent = `${rawKelly.toFixed(1)}%`;
+      document.getElementById('kpi-kelly-sub').textContent = `Half-Kelly Safety Target: ${(rawKelly / 2).toFixed(1)}%`;
+
+      const tbody = document.getElementById('scenario-tbody');
+      tbody.innerHTML = `
+        <tr>
+          <td><strong>YES Resolves ($1.00)</strong></td>
+          <td>$${nectarEnd.toFixed(2)}</td>
+          <td class="positive">$${pantaWinPayout.toFixed(2)}</td>
+          <td><strong>$${totalIfYes.toFixed(2)}</strong></td>
+          <td class="positive"><strong>+$${netIfYes.toFixed(2)} (+${((netIfYes/capital)*100).toFixed(1)}%)</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Expected Value (p=${Math.round(prob*100)}%)</strong></td>
+          <td>$${nectarEnd.toFixed(2)}</td>
+          <td class="${pantaEV >= 0 ? 'positive' : 'negative'}">$${(pantaStake + pantaEV).toFixed(2)}</td>
+          <td><strong>$${(capital + totalEV).toFixed(2)}</strong></td>
+          <td class="${totalEV >= 0 ? 'positive' : 'negative'}"><strong>${totalEV >= 0 ? '+' : ''}$${totalEV.toFixed(2)} (${totalEvPct >= 0 ? '+' : ''}${totalEvPct.toFixed(1)}%)</strong></td>
+        </tr>
+        <tr>
+          <td><strong>NO Resolves ($0.00)</strong></td>
+          <td>$${nectarEnd.toFixed(2)}</td>
+          <td class="negative">$0.00</td>
+          <td><strong>$${totalIfNo.toFixed(2)}</strong></td>
+          <td class="${netIfNo >= 0 ? 'positive' : 'negative'}"><strong>${netIfNo >= 0 ? '+' : ''}$${netIfNo.toFixed(2)} (${((netIfNo/capital)*100).toFixed(1)}%)</strong></td>
+        </tr>
+      `;
+
+      renderChart(capital, nectarYield, pantaStake, shares, price, prob);
+
+      document.getElementById('tweet-preview').textContent =
+        `My @PantaHQ x @Nectar_finance USDG Barbell Strategy:\n` +
+        `• Pool: $${capital.toLocaleString()} USDG (${nectarPct}% NectarFi Vault @ ${apy.toFixed(1)}% APY / ${pantaPct}% Panta YES @ $${price.toFixed(2)})\n` +
+        `• NectarFi Yield Cushion: +$${nectarYield.toFixed(2)} USDG\n` +
+        `• Upside if YES: +$${netIfYes.toFixed(2)} (+${((netIfYes/capital)*100).toFixed(1)}%) | Portfolio EV: +$${totalEV.toFixed(2)}\n` +
+        `cc @SuperteamNG #PantaMarkets`;
+    }
+
+    function renderChart(capital, nectarYield, pantaStake, shares, price, currentProb) {
+      const svg = document.getElementById('ev-svg');
+      const w = 700, h = 210, padL = 55, padR = 25, padT = 20, padB = 30;
+      const minEV = nectarYield - pantaStake;
+      const maxEV = nectarYield + (shares - pantaStake);
+      const range = Math.max(10, maxEV - minEV);
+
+      const xForProb = p => padL + p * (w - padL - padR);
+      const yForEV = ev => padT + (1 - (ev - minEV) / range) * (h - padT - padB);
+
+      const zeroY = Math.max(padT, Math.min(h - padB, yForEV(0)));
+      const xStart = xForProb(0.05);
+      const yStart = yForEV(nectarYield + (0.05 * (shares - pantaStake) - 0.95 * pantaStake));
+      const xEnd = xForProb(0.95);
+      const yEnd = yForEV(nectarYield + (0.95 * (shares - pantaStake) - 0.05 * pantaStake));
+
+      const curX = xForProb(currentProb);
+      const curEV = nectarYield + (currentProb * (shares - pantaStake) - (1 - currentProb) * pantaStake);
+      const curY = yForEV(curEV);
+      const breakEvenX = xForProb(price);
+
+      svg.innerHTML = `
+        <line x1="${padL}" y1="${zeroY}" x2="${w - padR}" y2="${zeroY}" stroke="#475569" stroke-dasharray="4 4" stroke-width="1.5" />
+        <text x="8" y="${zeroY + 4}" fill="#94a3b8" font-size="11">$0 EV</text>
+        <line x1="${breakEvenX}" y1="${padT}" x2="${breakEvenX}" y2="${h - padB}" stroke="#f59e0b" stroke-dasharray="3 3" stroke-width="1.5" />
+        <text x="${Math.min(w - 130, breakEvenX + 6)}" y="${padT + 14}" fill="#f59e0b" font-size="11">Market Price (${Math.round(price*100)}%)</text>
+        <line x1="${xStart}" y1="${yStart}" x2="${xEnd}" y2="${yEnd}" stroke="#14f195" stroke-width="3.5" />
+        <circle cx="${curX}" cy="${curY}" r="6.5" fill="#00c2ff" stroke="#fff" stroke-width="2" />
+        <text x="${Math.min(w - 150, curX + 10)}" y="${Math.max(25, curY - 8)}" fill="#00c2ff" font-weight="bold" font-size="12">
+          Your EV: ${curEV >= 0 ? '+' : ''}$${curEV.toFixed(0)} (${Math.round(currentProb*100)}%)
+        </text>
+      `;
+    }
+
+    function copyTweet() {
+      const text = document.getElementById('tweet-preview').textContent;
+      navigator.clipboard.writeText(text);
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied to Clipboard!';
+      setTimeout(() => { btn.textContent = 'Copy Strategy Post for X'; }, 1800);
+    }
+
+    recalc();
+  </script>
+</body>
+</html>
